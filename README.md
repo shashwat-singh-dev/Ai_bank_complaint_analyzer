@@ -160,7 +160,7 @@ GitHub:
 https://github.com/shashwat-singh-dev
 
 LinkedIn:
-(Add Your LinkedIn Profile)
+[https://www.linkedin.com/in/shashwatpy/]
 
 ---
 

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI-Powered Bank Complaint Analyzer</title>
+
+    <style>
+        body{
+            margin:0;
+            font-family:Arial, sans-serif;
+            background: linear-gradient(135deg,#0f172a,#1e293b);
+            color:white;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+        }
+
+        .container{
+            width:800px;
+            background:#1e293b;
+            padding:30px;
+            border-radius:20px;
+            box-shadow:0 0 25px rgba(0,0,0,0.4);
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        textarea{
+            width:100%;
+            height:180px;
+            padding:15px;
+            border:none;
+            border-radius:12px;
+            font-size:16px;
+            resize:none;
+            box-sizing:border-box;
+        }
+
+        button{
+            margin-top:20px;
+            width:100%;
+            padding:15px;
+            background:#2563eb;
+            color:white;
+            border:none;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:18px;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+        }
+
+        #result{
+            margin-top:25px;
+            padding:20px;
+            background:#334155;
+            border-radius:12px;
+            font-size:22px;
+            text-align:center;
+            font-weight:bold;
+        }
+
+        .history-box{
+            margin-top:25px;
+            padding:20px;
+            background:#334155;
+            border-radius:12px;
+            display:none;
+        }
+
+        .history-box h3{
+            text-align:center;
+            margin-top:0;
+            margin-bottom:15px;
+        }
+
+        .history-item{
+            background:#1e293b;
+            padding:12px;
+            margin-top:10px;
+            border-radius:10px;
+            border-left:4px solid #2563eb;
+        }
+
+        .history-category{
+            font-weight:bold;
+            color:#60a5fa;
+        }
+
+        .history-confidence{
+            color:#cbd5e1;
+            font-size:14px;
+            margin-top:5px;
+        }
+        .dashboard-btn{
+        display:block;
+        width:100%;
+        box-sizing:border-box;
+
+        text-align:center;
+        text-decoration:none;
+
+        background:#475569;
+        color:white;
+
+        padding:15px;
+        border-radius:12px;
+
+        margin-top:12px;
+
+        font-size:18px;
+        font-weight:bold;
+    }
+
+.dashboard-btn:hover{
+    background:#64748b;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🏦 AI Bank Complaint Analyzer</h1>
+
+    <textarea
+        id="complaint"
+        placeholder="Enter customer complaint here..."
+    ></textarea>
+
+    <button onclick="predictComplaint()">
+        Analyze Complaint
+    </button>
+    <a href="/dashboard" class="dashboard-btn">
+    📊 View Analytics Dashboard
+    </a>
+
+    <div id="result" style="display:none;"></div>
+
+    <div id="historyBox" class="history-box">
+        <h3>📜 Prediction History</h3>
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<script>
+
+async function predictComplaint(){
+
+    let complaint =
+        document.getElementById("complaint").value.trim();
+
+    if(complaint === ""){
+        alert("Please enter a complaint first.");
+        return;
+    }
+
+    let response = await fetch("/predict",{
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            complaint:complaint
+        })
+    });
+
+    let data = await response.json();
+
+    let resultBox =
+        document.getElementById("result");
+
+    resultBox.style.display = "block";
+
+    let badgeColor = "red";
+
+    if(data.confidence >= 85){
+        badgeColor = "#22c55e";
+    }
+    else if(data.confidence >= 60){
+        badgeColor = "#eab308";
+    }
+
+    resultBox.innerHTML = `
+    <div style="font-size:32px; margin-bottom:18px;">
+        Category: ${data.category}
+    </div>
+
+    <div>
+        Confidence:
+        <span style="
+            background:${badgeColor};
+            color:white;
+            padding:8px 16px;
+            border-radius:20px;
+            font-weight:bold;
+            margin-left:8px;
+        ">
+            ${data.confidence}%
+        </span>
+    </div>
+    `;
+
+    let historyBox =
+        document.getElementById("historyBox");
+
+    let historyList =
+        document.getElementById("historyList");
+
+    historyBox.style.display = "block";
+
+historyList.innerHTML =
+`
+<div class="history-item">
+    <div class="history-category">
+        ${data.category}
+    </div>
+
+    <div class="history-confidence">
+        Confidence: ${data.confidence}%
+    </div>
+</div>
+`
++ historyList.innerHTML;
+
+// Keep only latest 3 predictions
+while(historyList.children.length > 3){
+    historyList.removeChild(
+        historyList.lastElementChild
+    );
+}
+}
+
+</script>
+
+</body>
+</html>

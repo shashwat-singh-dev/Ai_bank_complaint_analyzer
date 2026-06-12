@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        body{
+            margin:0;
+            font-family:Arial,sans-serif;
+            background:linear-gradient(135deg,#0f172a,#1e293b);
+            color:white;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+        }
+
+        .container{
+            width:900px;
+            background:#1e293b;
+            padding:30px;
+            border-radius:20px;
+            box-shadow:0 0 25px rgba(0,0,0,0.4);
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .card{
+            background:#334155;
+            padding:20px;
+            border-radius:12px;
+            margin-bottom:20px;
+        }
+
+        .value{
+            font-size:36px;
+            font-weight:bold;
+            text-align:center;
+            margin-top:10px;
+        }
+
+        .history-box{
+            max-height:300px;
+            overflow-y:auto;
+        }
+
+        .history-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            background:#1e293b;
+            padding:12px;
+            margin-top:10px;
+
+            border-radius:10px;
+            border-left:4px solid #2563eb;
+        }
+
+        .left{
+            font-weight:bold;
+        }
+
+        .right{
+            color:#cbd5e1;
+            font-size:14px;
+        }
+
+        .chart-container{
+            width:650px;
+            height:350px;
+            margin:20px auto;
+        }
+
+        .back-btn{
+            display:block;
+            text-align:center;
+            text-decoration:none;
+            background:#2563eb;
+            color:white;
+            padding:12px;
+            border-radius:10px;
+            margin-top:20px;
+        }
+
+        .back-btn:hover{
+            background:#1d4ed8;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📊 Analytics Dashboard</h1>
+
+    <div class="card">
+
+        <h2>Total Predictions</h2>
+
+        <div class="value">
+            {{ total_predictions }}
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>📜 Prediction History</h2>
+
+        <div class="history-box">
+
+            {% for item in history %}
+
+            <div class="history-item">
+
+                <div class="left">
+                    {{ loop.index }}.
+                    {{ item.category }}
+                </div>
+
+                <div class="right">
+                    {{ item.time }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>🥧 Complaint Distribution</h2>
+
+        <div class="chart-container">
+            <canvas id="complaintChart"></canvas>
+        </div>
+
+    </div>
+
+    <a href="/" class="back-btn">
+        ← Back To Analyzer
+    </a>
+
+</div>
+
+<script>
+
+const labels = {{ chart_labels | tojson }};
+const values = {{ chart_values | tojson }};
+
+const total =
+    values.reduce((a,b) => a + b, 0);
+
+const ctx =
+    document.getElementById("complaintChart");
+
+new Chart(ctx, {
+
+    type: "pie",
+
+    data: {
+
+        labels: labels,
+
+        datasets: [{
+
+            data: values,
+
+            backgroundColor: [
+                "#3b82f6",
+                "#22c55e",
+                "#eab308",
+                "#ef4444",
+                "#a855f7",
+                "#06b6d4"
+            ]
+
+        }]
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            tooltip: {
+
+                callbacks: {
+
+                    label: function(context){
+
+                        let value =
+                            context.raw;
+
+                        let percentage =
+                            ((value / total) * 100)
+                            .toFixed(1);
+
+                        return percentage + "%";
+                    }
+                }
+            },
+
+            legend: {
+
+                position: "right",
+
+                labels: {
+                    color: "white",
+                    padding: 20,
+                    boxWidth: 18,
+                    font: {
+                        size: 13
+                    }
+                }
+            }
+        }
+    }
+
+});
+
+</script>
+</body>
+</html>

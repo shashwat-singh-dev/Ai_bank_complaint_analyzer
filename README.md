@@ -8,7 +8,7 @@ https://ai-bank-complaint-analyzer.onrender.com
 
 ---
 
-## 📌 Project Overviewwwwwwwwwwwwwwwwwww
+## 📌 Project Overviewwwwwwwwwwwwwwwww
 
 Banks receive thousands of customer complaints daily. Manually sorting these complaints into relevant departments is time-consuming and inefficient.
 
